@@ -1,0 +1,55 @@
+import math
+
+def calculator():
+    print("=== Simple Python Calculator ===")
+    print("Available operations: +, -, *, /, %, ^ (power), sqrt (square root), exit")
+
+    while True:
+        op = input("\nEnter operation: ").lower()
+
+        if op == "exit":
+            print("👋 Exiting calculator. Goodbye!")
+            break
+
+        if op == "sqrt":  # Square root only needs one number
+            try:
+                num = float(input("Enter a number: "))
+                if num < 0:
+                    print("⚠️ Error: Cannot calculate square root of a negative number.")
+                else:
+                    print(f"Result: √{num} = {math.sqrt(num)}")
+            except ValueError:
+                print("⚠️ Invalid input. Please enter a number.")
+            continue
+
+        # For all other operations, take two numbers
+        try:
+            num1 = float(input("Enter first number: "))
+            num2 = float(input("Enter second number: "))
+
+            if op == "+":
+                print(f"Result: {num1} + {num2} = {num1 + num2}")
+            elif op == "-":
+                print(f"Result: {num1} - {num2} = {num1 - num2}")
+            elif op == "*":
+                print(f"Result: {num1} * {num2} = {num1 * num2}")
+            elif op == "/":
+                if num2 == 0:
+                    print("⚠️ Error: Division by zero is not allowed.")
+                else:
+                    print(f"Result: {num1} / {num2} = {num1 / num2}")
+            elif op == "%":
+                if num2 == 0:
+                    print("⚠️ Error: Modulus by zero is not allowed.")
+                else:
+                    print(f"Result: {num1} % {num2} = {num1 % num2}")
+            elif op == "^":
+                print(f"Result: {num1} ^ {num2} = {num1 ** num2}")
+            else:
+                print("⚠️ Invalid operation. Try again.")
+
+        except ValueError:
+            print("⚠️ Invalid input. Please enter valid numbers.")
+
+if __name__ == "__main__":
+    calculator()
