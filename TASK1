@@ -1,0 +1,154 @@
+import json
+from datetime import datetime
+
+# File to store tasks
+TASK_FILE = "tasks.json"
+
+# Load tasks from file if exists
+def load_tasks():
+    try:
+        with open(TASK_FILE, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+# Save tasks back to file
+def save_tasks(tasks):
+    with open(TASK_FILE, "w") as f:
+        json.dump(tasks, f, indent=4)
+
+# Display tasks in a nice format
+def show_tasks(tasks):
+    if not tasks:
+        print("\n📋 No tasks found.\n")
+    else:
+        print("\n=== Your To-Do List ===")
+        for i, task in enumerate(tasks, 1):
+            status = "✅" if task["completed"] else "❌"
+            print(f"{i}. {task['title']} | Due: {task['due_date']} | Priority: {task['priority']} | {status}")
+        print()
+
+# Add a new task
+def add_task(tasks):
+    title = input("Enter task title: ")
+    due_date = input("Enter due date (YYYY-MM-DD) or leave blank: ")
+    if not due_date:
+        due_date = "No deadline"
+    priority = input("Enter priority (High/Medium/Low): ").capitalize()
+    if priority not in ["High", "Medium", "Low"]:
+        priority = "Low"
+    task = {"title": title, "due_date": due_date, "priority": priority, "completed": False}
+    tasks.append(task)
+    save_tasks(tasks)
+    print("✅ Task added successfully!\n")
+
+# Mark a task as completed
+def complete_task(tasks):
+    show_tasks(tasks)
+    try:
+        task_no = int(input("Enter task number to mark as completed: "))
+        tasks[task_no-1]["completed"] = True
+        save_tasks(tasks)
+        print("🎉 Task marked as completed!\n")
+    except (ValueError, IndexError):
+        print("⚠️ Invalid task number.\n")
+
+# Update a task
+def update_task(tasks):
+    show_tasks(tasks)
+    try:
+        task_no = int(input("Enter task number to update: "))
+        task = tasks[task_no-1]
+        new_title = input(f"Enter new title (leave blank to keep '{task['title']}'): ")
+        new_due = input(f"Enter new due date (leave blank to keep '{task['due_date']}'): ")
+        new_priority = input(f"Enter new priority (leave blank to keep '{task['priority']}'): ")
+
+        if new_title: task["title"] = new_title
+        if new_due: task["due_date"] = new_due
+        if new_priority: task["priority"] = new_priority.capitalize()
+
+        save_tasks(tasks)
+        print("✏️ Task updated successfully!\n")
+    except (ValueError, IndexError):
+        print("⚠️ Invalid task number.\n")
+
+# Delete a task
+def delete_task(tasks):
+    show_tasks(tasks)
+    try:
+        task_no = int(input("Enter task number to delete: "))
+        removed = tasks.pop(task_no-1)
+        save_tasks(tasks)
+        print(f"🗑️ Task '{removed['title']}' deleted.\n")
+    except (ValueError, IndexError):
+        print("⚠️ Invalid task number.\n")
+
+# Search tasks by keyword
+def search_tasks(tasks):
+    keyword = input("Enter keyword to search: ").lower()
+    found = [task for task in tasks if keyword in task["title"].lower()]
+    show_tasks(found)
+
+# Sort tasks by priority or due date
+def sort_tasks(tasks):
+    choice = input("Sort by (priority/date): ").lower()
+    if choice == "priority":
+        priority_order = {"High": 1, "Medium": 2, "Low": 3}
+        tasks.sort(key=lambda x: priority_order.get(x["priority"], 3))
+        print("📌 Tasks sorted by priority!\n")
+    elif choice == "date":
+        tasks.sort(key=lambda x: datetime.strptime(x["due_date"], "%Y-%m-%d") if x["due_date"] != "No deadline" else datetime.max)
+        print("📆 Tasks sorted by due date!\n")
+    save_tasks(tasks)
+
+# Clear completed tasks
+def clear_completed(tasks):
+    tasks = [task for task in tasks if not task["completed"]]
+    save_tasks(tasks)
+    print("🧹 All completed tasks removed.\n")
+    return tasks
+
+# Main menu
+def main():
+    tasks = load_tasks()
+
+    while True:
+        print("\n--- To-Do List Menu ---")
+        print("1. Show Tasks")
+        print("2. Add Task")
+        print("3. Complete Task")
+        print("4. Update Task")
+        print("5. Delete Task")
+        print("6. Search Tasks")
+        print("7. Sort Tasks")
+        print("8. Clear Completed Tasks")
+        print("9. Exit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            show_tasks(tasks)
+        elif choice == "2":
+            add_task(tasks)
+        elif choice == "3":
+            complete_task(tasks)
+        elif choice == "4":
+            update_task(tasks)
+        elif choice == "5":
+            delete_task(tasks)
+        elif choice == "6":
+            search_tasks(tasks)
+        elif choice == "7":
+            sort_tasks(tasks)
+        elif choice == "8":
+            tasks = clear_completed(tasks)
+        elif choice == "9":
+            print("👋 Goodbye!")
+            break
+        else:
+            print("⚠️ Invalid choice. Try again.\n")
+
+if __name__ == "__main__":
+    main()
