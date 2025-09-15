@@ -1,0 +1,49 @@
+import random
+import string
+
+def generate_password(length=8, use_upper=True, use_lower=True, use_digits=True, use_special=True):
+    characters = ""
+    if use_upper:
+        characters += string.ascii_uppercase
+    if use_lower:
+        characters += string.ascii_lowercase
+    if use_digits:
+        characters += string.digits
+    if use_special:
+        characters += string.punctuation
+
+    if not characters:
+        return "⚠️ Error: No character types selected!"
+
+    # Ensure at least one character from each selected type
+    password = []
+    if use_upper:
+        password.append(random.choice(string.ascii_uppercase))
+    if use_lower:
+        password.append(random.choice(string.ascii_lowercase))
+    if use_digits:
+        password.append(random.choice(string.digits))
+    if use_special:
+        password.append(random.choice(string.punctuation))
+
+    # Fill the rest randomly
+    password += [random.choice(characters) for _ in range(length - len(password))]
+    random.shuffle(password)
+
+    return "".join(password)
+
+def main():
+    print("=== Password Generator ===")
+    length = int(input("Enter password length: "))
+    num_passwords = int(input("How many passwords do you want to generate? "))
+
+    use_upper = input("Include uppercase letters? (y/n): ").lower() == "y"
+    use_lower = input("Include lowercase letters? (y/n): ").lower() == "y"
+    use_digits = input("Include digits? (y/n): ").lower() == "y"
+    use_special = input("Include special characters? (y/n): ").lower() == "y"
+
+    for i in range(num_passwords):
+        print(f"Password {i+1}: {generate_password(length, use_upper, use_lower, use_digits, use_special)}")
+
+if __name__ == "__main__":
+    main()
